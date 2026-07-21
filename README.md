@@ -31,8 +31,8 @@ Final result ──────── with a full trace: every prompt, tool call
 |---|---|
 | LLM client wrapper (tokens, latency, cost tracking) | ✅ Done |
 | Structured outputs (JSON mode + Pydantic validation + self-correcting retry) | ✅ Done |
-| Tool registry + agentic tool-calling loop | 🔨 In progress |
-| Supervisor agent (task decomposition into executable plans) | ⏳ Planned |
+| Tool registry + agentic tool-calling loop | ✅ Done |
+| Supervisor agent (task decomposition into executable plans) | 🔨 In progress |
 | Executor state machine + reviewer agent | ⏳ Planned |
 | Working memory + long-term semantic memory | ⏳ Planned |
 | Human-in-the-loop approval queue (FastAPI) | ⏳ Planned |
