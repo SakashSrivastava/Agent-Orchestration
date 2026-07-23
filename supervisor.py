@@ -16,6 +16,13 @@ Rules:
 - Prefer 2-5 subtasks. Do not pad the plan with unnecessary steps."""
 
 def make_plan(task: str) -> Plan:
-    plan=call_llm_structured(prompt=task, schema=Plan, system=SUPERVISOR_SYSTEM)
+    from memory import recall
+    memories = recall(task)
+    prompt = task
+    if memories:
+        prompt += ("\n\nLessons from similar past tasks (use if relevant):\n- "
+                   + "\n- ".join(memories))
+        print(f"  (recalled {len(memories)} memories)")
+    plan = call_llm_structured(prompt=prompt, schema=Plan, system=SUPERVISOR_SYSTEM)
     execution_order(plan)
     return plan

@@ -34,3 +34,8 @@ def execution_order(plan: Plan) -> list[list[int]]:
         waves.append(wave)
         done.update(wave)
     return waves
+
+class Review(BaseModel):
+    verdict: Literal["approve", "reject"]
+    score: int = Field(ge=1, le=5, description="Quality score, 5 = flawless")
+    feedback: str = Field(description="If rejecting, say exactly what to fix")

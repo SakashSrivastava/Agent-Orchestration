@@ -1,4 +1,5 @@
 import os
+import sqlite3
 import time
 from dotenv import load_dotenv
 from pydantic import BaseModel
@@ -27,6 +28,23 @@ class LLMResponse(BaseModel):
     latency_s: float
     cost_usd: float
 
+
+def log_call(model: str, usage, latency: float, caller: str) -> None:
+    price_in, price_out = PRICES.get(model, (0.0, 0.0))
+    cost = (usage.prompt_tokens * price_in + usage.completion_tokens * price_out) / 1_000_000
+    conn = sqlite3.connect("orchestrator.db")
+    conn.execute("""CREATE TABLE IF NOT EXISTS llm_calls (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ts REAL, caller TEXT, model TEXT,
+        input_tokens INTEGER, output_tokens INTEGER,
+        cost_usd REAL, latency_s REAL)""")
+    conn.execute("INSERT INTO llm_calls (ts, caller, model, input_tokens, output_tokens, "
+                 "cost_usd, latency_s) VALUES (?,?,?,?,?,?,?)",
+                 (time.time(), caller, model, usage.prompt_tokens,
+                  usage.completion_tokens, round(cost, 8), round(latency, 3)))
+    conn.commit()
+    conn.close()
+
 def call_llm(
     prompt: str,
     system: str="",
@@ -45,6 +63,7 @@ def call_llm(
         messages=messages,
     )
     latency=time.perf_counter()-start
+    log_call(model, response.usage, latency, caller="call_llm")
 
     in_tok=response.usage.prompt_tokens
     out_tok=response.usage.completion_tokens
@@ -85,6 +104,7 @@ def call_llm_structured(
                 "Fix it and reply with valid JSON only."
             )
 
+        start = time.perf_counter()
         response = client.chat.completions.create(
             model=model,
             max_tokens=max_tokens,
@@ -94,6 +114,7 @@ def call_llm_structured(
                 {"role": "user", "content": full_prompt},
             ],
         )
+        log_call(model, response.usage, time.perf_counter() - start, caller="call_llm_structured")
         raw = response.choices[0].message.content
 
         try:
