@@ -28,6 +28,18 @@ def read_file(filename: str) -> str:
         return f"Error: {filename} does not exist"
     return path.read_text(encoding="utf-8")
 
+def web_search(query: str) -> str:
+    try:
+        from ddgs import DDGS
+        results = DDGS().text(query, max_results=5)
+        if not results:
+            return "No results found."
+        lines = [f"- {r.get('title', '')}: {r.get('body', '')[:250]} ({r.get('href', '')})"
+                 for r in results]
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error: web search failed - {e}"
+
 TOOL_SCHEMAS = [
     {"type": "function", "function": {
         "name": "calculator",
@@ -48,10 +60,18 @@ TOOL_SCHEMAS = [
         "parameters": {"type": "object",
                        "properties": {"filename": {"type": "string"}},
                        "required": ["filename"]}}},
+    {"type": "function", "function": {
+        "name": "web_search",
+        "description": "Search the live web. Returns the top results as titles with "
+                       "snippets and URLs. Use focused queries, e.g. 'Anthropic recent news'",
+        "parameters": {"type": "object",
+                       "properties": {"query": {"type": "string"}},
+                       "required": ["query"]}}},
 ]
 
 TOOL_FUNCTIONS = {
     "calculator": calculator,
     "write_file": write_file,
     "read_file": read_file,
+    "web_search": web_search,
 }

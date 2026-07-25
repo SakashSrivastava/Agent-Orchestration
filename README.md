@@ -38,7 +38,9 @@ Final result ──────── with a full trace: every prompt, tool call
 | Long-term memory: lesson extraction, similarity recall into planning | ✅ Done |
 | Human-in-the-loop approval queue (CLI + dashboard buttons) | ✅ Done |
 | Call logging + Streamlit dashboard (tasks, costs, approvals, memory) | ✅ Done |
-| End-to-end tests, Docker, demo | 🔨 In progress |
+| Live web search tool + flagship demo scenario | ✅ Done |
+| Unit test suite (19 tests: scheduler, schemas, sandbox, state, memory) | ✅ Done |
+| Docker + demo video | 🔨 In progress |
 
 ## Stack
 
@@ -53,7 +55,7 @@ Final result ──────── with a full trace: every prompt, tool call
 ```bash
 python -m venv .venv
 .venv\Scripts\activate          # Windows
-pip install openai pydantic python-dotenv streamlit
+pip install -r requirements.txt
 ```
 
 Create a `.env` file:
@@ -76,6 +78,8 @@ python test_executor.py     # plan -> specialists -> reviewer -> synthesized ans
 python test_hitl.py         # runs until the writer needs approval, then pauses
 python approve.py           # review the queue; approve/reject resumes the task
 streamlit run dashboard.py  # task browser, cost analytics, approval buttons
+python demo.py              # flagship: live web research -> tailored outreach note
+pytest tests/               # 19 unit tests, no API calls needed
 ```
 
 ## Design decisions
@@ -94,6 +98,7 @@ streamlit run dashboard.py  # task browser, cost analytics, approval buttons
 - **Groq's Llama intermittently emits malformed tool calls** (a 400 `tool_use_failed`, randomly). Fix: catch that specific error and retry within the step budget; any other 400 still crashes loudly. Recovery is targeted, never blanket.
 - **Keyword-based memory recall missed "calculation" vs "calculate".** Jaccard similarity over exact tokens can't see morphology or synonyms. This is the concrete failure that motivates embeddings. Similarity lives behind one function, so swapping in embeddings touches one function.
 - **Resuming an already-completed task re-ran synthesis and stored a duplicate memory.** Fix: terminal states (`done`, `failed`) refuse to resume. Guard entry points against invalid states.
+- **Evidence truncation re-broke the reviewer.** The tool log capped each result at 200 characters, which was fine for calculator outputs but amputated file reads and web results. The specialist saw the full data, the reviewer saw the first 200 characters, and everything cited from beyond the cap looked fabricated: 6 false rejections in one run. Fix: raised the cap to 2,000. Same subsystem as the first reviewer bug, failing a second time for a related but different reason: a limit chosen for yesterday's data silently broke on today's data.
 
 ## Known limitations (deliberate, documented)
 

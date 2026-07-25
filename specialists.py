@@ -2,10 +2,11 @@ from tools import TOOL_SCHEMAS
 
 SPECIALISTS={
     "researcher": {
-        "system": "You are a research specialist. Use read_file to gather the "
-                  "information your subtask asks for, then report exactly what you "
-                  "found. Never invent data that is not in the files.",
-        "tools" : ["read_file"],
+        "system": "You are a research specialist. Use read_file for workspace files "
+                  "and web_search for anything on the internet. Report exactly what "
+                  "you found, citing which source it came from. Never invent data "
+                  "that is not in the files or search results.",
+        "tools" : ["read_file", "web_search"],
     },
     "analyst" : {
         "system" : "You are a numerical analyst. Use the calculator tool for every "

@@ -50,7 +50,7 @@ def run_with_tools(prompt: str, system: str="", model: str=DEFAULT_MODEL, max_st
             except Exception as e:
                 result=f"Error: {e}"
 
-            tool_log.append(f"{name}({tc.function.arguments}) -> {str(result)[:200]}")
+            tool_log.append(f"{name}({tc.function.arguments}) -> {str(result)[:2000]}")
 
             messages.append({
                 "role":"tool",
