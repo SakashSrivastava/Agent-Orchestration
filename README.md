@@ -40,7 +40,8 @@ Final result ──────── with a full trace: every prompt, tool call
 | Call logging + Streamlit dashboard (tasks, costs, approvals, memory) | ✅ Done |
 | Live web search tool + flagship demo scenario | ✅ Done |
 | Unit test suite (19 tests: scheduler, schemas, sandbox, state, memory) | ✅ Done |
-| Docker + demo video | 🔨 In progress |
+| Dockerfile + .dockerignore | ✅ Done |
+| Dashboard screenshots + demo video | 🔨 In progress |
 
 ## Stack
 
@@ -69,6 +70,14 @@ Smoke test:
 ```bash
 python test_llm.py          # basic call: text + tokens + cost + latency
 python test_structured.py   # structured output: validated Pydantic object
+```
+
+Or run with Docker (no local Python needed):
+
+```bash
+docker build -t agent-orchestrator .
+docker run -it --env-file .env -p 8501:8501 agent-orchestrator      # dashboard at localhost:8501
+docker run -it --env-file .env agent-orchestrator python demo.py    # flagship demo in the terminal
 ```
 
 Full pipeline and dashboard:
