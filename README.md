@@ -4,7 +4,7 @@ A multi-agent orchestration system built **from scratch**: no LangGraph, no Crew
 
 The goal: understand and own every layer that agent frameworks abstract away, including the planning loop, the tool-calling loop, state management, and observability.
 
-## Architecture (target)
+## Architecture
 
 ```
 Your task
@@ -41,7 +41,6 @@ Final result ──────── with a full trace: every prompt, tool call
 | Live web search tool + flagship demo scenario | ✅ Done |
 | Unit test suite (19 tests: scheduler, schemas, sandbox, state, memory) | ✅ Done |
 | Dockerfile + .dockerignore | ✅ Done |
-| Dashboard screenshots + demo video | 🔨 In progress |
 
 ## Stack
 
